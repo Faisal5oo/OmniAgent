@@ -1,27 +1,26 @@
-# src/nodes/drafter.py
 from langchain_openai import ChatOpenAI
 from src.config import settings
 from src.state import AgentState
+
 
 async def email_drafter_node(state: AgentState) -> dict:
     """
     Consumes CRM qualification fields and filtered corporate RAG constraints 
     to draft an enterprise-level, compliance-aligned B2B outreach asset.
     """
-    lead_data = state.get("lead_data", {})
-    retrieved_context = state.get("retrieved_context", [])
+    lead_data = state.lead_data
+    retrieved_context = state.retrieved_context
     
-    company = lead_data.get("company", "Unknown Organization")
-    budget = lead_data.get("budget", 0)
-    is_qualified = lead_data.get("qualified", False)
+    company = state.lead_data.get("company", "Unknown Organization")
+    budget = state.lead_data.get("budget", 0)
+    is_qualified = state.lead_data.get("qualified", False)
     
-    # Collapse the context array into a clean prompt injection
     context_str = "\n".join(retrieved_context) if retrieved_context else "No corporate policies applied."
     
     llm = ChatOpenAI(
-        api_key=settings.OPENROUTER_API_KEY.get_secret_value(),
+        api_key=settings.OPENROUTER_API_KEY.get_secret_value(),  #
         base_url=settings.OPENROUTER_BASE_URL,
-        model=settings.LLM_MODEL
+        model=settings.RAG_MODEL
     )
     
     system_prompt = (
@@ -41,10 +40,9 @@ async def email_drafter_node(state: AgentState) -> dict:
     
     response = await llm.ainvoke(system_prompt)
     
-    active_nodes = state.get("active_nodes", []) + ["drafter"]
-    
     return {
         "email_draft": response.content,
         "requires_approval": True,
-        "active_nodes": active_nodes
+        "active_nodes": ["email_drafter_node"]
     }
+

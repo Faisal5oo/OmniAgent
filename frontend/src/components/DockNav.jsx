@@ -1,0 +1,106 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
+import { Hexagon, Layers, Users, Scale } from "lucide-react";
+import { SPRING_TRANSITION } from "@/lib/constants";
+
+const ITEMS = [
+  { icon: Layers, label: "Console", href: "/", match: (path) => path === "/" },
+  {
+    icon: Users,
+    label: "Leads",
+    href: "/leads",
+    match: (path) => path === "/leads" || path.startsWith("/leads/"),
+  },
+  {
+    icon: Scale,
+    label: "Decision Desk",
+    href: "/desk",
+    match: (path) => path === "/desk" || path.startsWith("/desk/"),
+  },
+];
+
+export default function DockNav() {
+  const pathname = usePathname();
+
+  return (
+    <motion.nav
+      className="surface-sm fixed inset-x-3 bottom-3 z-40 flex h-[64px] flex-row items-center justify-between px-2 safe-bottom md:static md:inset-auto md:bottom-auto md:z-auto md:h-auto md:w-[72px] md:shrink-0 md:flex-col md:justify-start md:self-stretch md:px-0 md:py-5"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={SPRING_TRANSITION}
+      aria-label="Primary"
+    >
+      <Link
+        href="/"
+        className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl md:mb-7"
+        style={{
+          background:
+            "linear-gradient(145deg, rgba(61,255,168,0.18), rgba(232,184,109,0.08))",
+          boxShadow:
+            "0 0 0 1px rgba(61,255,168,0.22), 0 8px 24px rgba(61,255,168,0.12), inset 0 1px 0 rgba(255,255,255,0.1)",
+        }}
+        aria-label="OmniAgent home"
+      >
+        <Hexagon className="h-5 w-5 text-signal" strokeWidth={1.6} />
+        <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-signal shadow-signal" />
+      </Link>
+
+      <div className="flex flex-1 flex-row items-center justify-center gap-1 md:flex-none md:flex-col md:gap-1.5">
+        {ITEMS.map(({ icon: Icon, label, href, match }, i) => {
+          const active = match(pathname);
+
+          return (
+            <Link key={label} href={href} title={label} aria-label={label}>
+              <motion.span
+                className={`group relative flex h-11 w-11 items-center justify-center rounded-2xl transition-colors ${
+                  active
+                    ? "text-signal"
+                    : "text-mist hover:bg-ink-700/60 hover:text-mist-bright"
+                }`}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ ...SPRING_TRANSITION, delay: 0.06 + i * 0.04 }}
+                whileHover={{ scale: 1.06 }}
+                whileTap={{ scale: 0.94 }}
+              >
+                {active && (
+                  <motion.span
+                    layoutId="dock-active"
+                    className="absolute inset-0 rounded-2xl"
+                    style={{
+                      background: "rgba(61,255,168,0.1)",
+                      boxShadow:
+                        "0 0 0 1px rgba(61,255,168,0.28), 0 0 20px rgba(61,255,168,0.12)",
+                    }}
+                    transition={SPRING_TRANSITION}
+                  />
+                )}
+                <Icon className="relative h-[18px] w-[18px]" strokeWidth={1.6} />
+                {active && (
+                  <>
+                    <span className="absolute -left-[3px] hidden h-4 w-[2px] rounded-full bg-signal md:block" />
+                    <span className="absolute -bottom-[3px] h-[2px] w-4 rounded-full bg-signal md:hidden" />
+                  </>
+                )}
+              </motion.span>
+            </Link>
+          );
+        })}
+      </div>
+
+      <div className="hidden flex-col items-center gap-2 md:mt-auto md:flex">
+        <div className="h-8 w-px bg-gradient-to-b from-transparent via-mist/30 to-transparent" />
+        <span className="font-mono text-[9px] tracking-[0.2em] text-mist">
+          v1.0
+        </span>
+      </div>
+
+      <span className="w-11 text-center font-mono text-[9px] tracking-[0.16em] text-mist md:hidden">
+        OA
+      </span>
+    </motion.nav>
+  );
+}

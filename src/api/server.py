@@ -32,6 +32,10 @@ class AgentExecutionRequest(BaseModel):
 class AgentApprovalRequest(BaseModel):
     thread_id: str = Field(..., description="Target thread session memory ID to resume.")
     approve: bool = Field(..., description="Boolean flag confirming or rejecting content propagation.")
+    email_draft: str | None = Field(
+        None,
+        description="Final human-edited email body submitted at approval time.",
+    )
 
 
 @app.get("/health")
@@ -105,9 +109,17 @@ async def process_human_approval(payload: AgentApprovalRequest) -> Dict[str, Any
             detail="The requested thread session execution path is not in an actionable paused state."
         )
         
+    update_values: Dict[str, Any] = {
+        "is_approved": payload.approve,
+        "requires_approval": False,
+    }
+
+    if payload.approve and payload.email_draft is not None:
+        update_values["email_draft"] = payload.email_draft
+
     await compiled_graph.aupdate_state(
         config=config,
-        values={"is_approved": payload.approve, "requires_approval": False},
+        values=update_values,
         as_node="drafter"
     )
     

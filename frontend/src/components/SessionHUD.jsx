@@ -47,7 +47,7 @@ function ProgressRing({ value, color, size = 64 }) {
 }
 
 const CARD =
-  "surface-sm flex h-[108px] flex-col justify-between p-3.5 sm:h-[116px] sm:p-4";
+  "surface-sm interactive-card flex h-[108px] flex-col justify-between p-3.5 sm:h-[116px] sm:p-4";
 
 export default function SessionHUD({ nodeStates, isStreaming, completion }) {
   const completed = PIPELINE_NODES.filter(
@@ -73,15 +73,20 @@ export default function SessionHUD({ nodeStates, isStreaming, completion }) {
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ ...SPRING_TRANSITION, delay: 0.04 }}
-        whileHover={{ y: -2 }}
+        whileHover={{ y: -4, scale: 1.012 }}
+        whileTap={{ scale: 0.985 }}
       >
-        <div className="relative flex h-16 w-16 shrink-0 items-center justify-center">
+        <motion.div
+          className="relative flex h-16 w-16 shrink-0 items-center justify-center"
+          animate={isStreaming ? { scale: [1, 1.04, 1] } : { scale: 1 }}
+          transition={{ duration: 2, repeat: isStreaming ? Infinity : 0 }}
+        >
           <ProgressRing value={progress} color="#3dffa8" size={64} />
           <span className="absolute font-display text-sm font-semibold tabular-nums text-[#eef2f7]">
             {progress}
             <span className="text-[10px] text-mist">%</span>
           </span>
-        </div>
+        </motion.div>
         <div className="min-w-0">
           <p className="meta mb-1">Pipeline</p>
           <p className="title text-lg tabular-nums leading-none">
@@ -102,11 +107,17 @@ export default function SessionHUD({ nodeStates, isStreaming, completion }) {
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ ...SPRING_TRANSITION, delay: 0.09 }}
-        whileHover={{ y: -2 }}
+        whileHover={{ y: -4, scale: 1.012 }}
+        whileTap={{ scale: 0.985 }}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Activity className="h-3.5 w-3.5 text-signal/70" strokeWidth={1.75} />
+            <motion.span
+              animate={isStreaming ? { rotate: [0, 12, -8, 0] } : {}}
+              transition={{ duration: 1.6, repeat: isStreaming ? Infinity : 0 }}
+            >
+              <Activity className="h-3.5 w-3.5 text-signal/70" strokeWidth={1.75} />
+            </motion.span>
             <p className="meta">Execution</p>
           </div>
           {isStreaming ? (
@@ -128,17 +139,24 @@ export default function SessionHUD({ nodeStates, isStreaming, completion }) {
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ ...SPRING_TRANSITION, delay: 0.14 }}
-        whileHover={{ y: -2 }}
+        whileHover={{ y: -4, scale: 1.012 }}
+        whileTap={{ scale: 0.985 }}
       >
         <div className="flex items-center gap-2">
-          <Zap className="h-3.5 w-3.5 text-brass/80" strokeWidth={1.75} />
+          <motion.span
+            whileHover={{ rotate: -12, scale: 1.15 }}
+            transition={SPRING_TRANSITION}
+          >
+            <Zap className="h-3.5 w-3.5 text-brass/80" strokeWidth={1.75} />
+          </motion.span>
           <p className="meta">Lead intel</p>
         </div>
         {completion?.lead_data ? (
           <motion.div
             className="min-w-0 space-y-1"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={SPRING_TRANSITION}
           >
             {matchedLead ? (
               <Link
@@ -161,9 +179,12 @@ export default function SessionHUD({ nodeStates, isStreaming, completion }) {
         ) : (
           <Link
             href="/leads"
-            className="flex items-center gap-2.5 text-mist transition hover:text-mist-bright"
+            className="group flex items-center gap-2.5 text-mist transition hover:text-mist-bright"
           >
-            <div className="h-8 w-8 shrink-0 rounded-lg border border-dashed border-mist/20 bg-ink-950/40" />
+            <motion.div
+              className="h-8 w-8 shrink-0 rounded-lg border border-dashed border-mist/25 bg-ink-950/40"
+              whileHover={{ scale: 1.08, borderColor: "rgba(61,255,168,0.4)" }}
+            />
             <span className="text-sm">View lead portfolio</span>
           </Link>
         )}

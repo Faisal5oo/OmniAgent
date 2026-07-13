@@ -35,18 +35,23 @@ const FILTERS = [
 function StatCard({ label, value, hint, accent, delay }) {
   return (
     <motion.div
-      className="surface-sm p-3.5 sm:p-4"
+      className="surface-sm interactive-card p-3.5 sm:p-4"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ ...SPRING_TRANSITION, delay }}
+      whileHover={{ y: -4, scale: 1.015 }}
+      whileTap={{ scale: 0.985 }}
     >
       <p className="meta mb-1.5">{label}</p>
-      <p
+      <motion.p
         className="font-display text-xl font-semibold tracking-tight tabular-nums sm:text-2xl"
         style={accent ? { color: accent } : undefined}
+        initial={{ opacity: 0, scale: 0.92 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ ...SPRING_TRANSITION, delay: delay + 0.08 }}
       >
         {value}
-      </p>
+      </motion.p>
       {hint && <p className="mt-1 text-[11px] text-mist">{hint}</p>}
     </motion.div>
   );
@@ -57,30 +62,35 @@ function LeadRow({ lead, index }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ ...SPRING_TRANSITION, delay: 0.04 + index * 0.03 }}
+      initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      transition={{ ...SPRING_TRANSITION, delay: 0.04 + index * 0.04 }}
+      whileHover={{ y: -3, scale: 1.008 }}
+      whileTap={{ scale: 0.992 }}
+      layout
     >
       <Link
         href={`/leads/${lead.id}`}
-        className="group surface-sm relative flex flex-col gap-3 p-3.5 transition hover:border-white/10 sm:flex-row sm:items-center sm:gap-4 sm:p-4"
+        className="group surface-sm interactive-card relative flex flex-col gap-3 p-3.5 sm:flex-row sm:items-center sm:gap-4 sm:p-4"
       >
         <span
-          className="absolute bottom-3 left-0 top-3 w-[2px] rounded-full opacity-0 transition group-hover:opacity-100 sm:bottom-4 sm:top-4"
+          className="absolute bottom-3 left-0 top-3 w-[2px] origin-center scale-y-0 rounded-full opacity-0 transition duration-300 group-hover:scale-y-100 group-hover:opacity-100 sm:bottom-4 sm:top-4"
           style={{ background: meta.color }}
         />
 
         <div className="flex min-w-0 flex-1 items-start gap-3 pr-6 sm:pr-0">
-          <div
+          <motion.div
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-display text-sm font-semibold"
             style={{
               background: meta.bg,
               color: meta.color,
               boxShadow: `0 0 0 1px ${meta.border}`,
             }}
+            whileHover={{ rotate: -6, scale: 1.08 }}
+            transition={SPRING_TRANSITION}
           >
             {lead.company.slice(0, 2).toUpperCase()}
-          </div>
+          </motion.div>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <h3 className="font-display text-[15px] font-semibold tracking-tight text-[#eef2f7] transition group-hover:text-white">
@@ -121,7 +131,13 @@ function LeadRow({ lead, index }) {
           </div>
         </div>
 
-        <ArrowUpRight className="absolute right-3.5 top-3.5 h-4 w-4 text-mist-dim opacity-40 transition group-hover:text-signal group-hover:opacity-100 sm:static" />
+        <motion.span
+          className="absolute right-3.5 top-3.5 text-mist opacity-40 sm:static sm:opacity-50"
+          whileHover={{ x: 2, y: -2, opacity: 1, color: "#3dffa8" }}
+          transition={SPRING_TRANSITION}
+        >
+          <ArrowUpRight className="h-4 w-4 group-hover:text-signal group-hover:opacity-100" />
+        </motion.span>
       </Link>
     </motion.div>
   );
@@ -226,27 +242,36 @@ function LeadsContent() {
           />
         </div>
         <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <Filter className="mr-0.5 hidden h-3.5 w-3.5 shrink-0 text-mist-dim sm:block" />
+          <Filter className="mr-0.5 hidden h-3.5 w-3.5 shrink-0 text-mist sm:block" />
           {FILTERS.map((f) => {
             const active = filter === f.id;
             return (
-              <button
+              <motion.button
                 key={f.id}
                 type="button"
                 onClick={() => setFilter(f.id)}
-                className={`shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-medium transition ${
-                  active
-                    ? "bg-signal/15 text-signal"
-                    : "text-mist hover:bg-ink-700/50 hover:text-mist-bright"
+                className={`relative shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-medium ${
+                  active ? "text-signal" : "text-mist hover:text-mist-bright"
                 }`}
                 style={
-                  active
-                    ? { boxShadow: "0 0 0 1px rgba(61,255,168,0.28)" }
-                    : { boxShadow: "0 0 0 1px rgba(139,156,179,0.1)" }
+                  !active
+                    ? { boxShadow: "0 0 0 1px rgba(184,198,216,0.12)" }
+                    : undefined
                 }
+                whileHover={{ y: -1 }}
+                whileTap={{ scale: 0.94 }}
+                transition={SPRING_TRANSITION}
               >
-                {f.label}
-              </button>
+                {active && (
+                  <motion.span
+                    layoutId="lead-filter-pill"
+                    className="absolute inset-0 rounded-lg bg-signal/15"
+                    style={{ boxShadow: "0 0 0 1px rgba(61,255,168,0.28)" }}
+                    transition={SPRING_TRANSITION}
+                  />
+                )}
+                <span className="relative">{f.label}</span>
+              </motion.button>
             );
           })}
         </div>

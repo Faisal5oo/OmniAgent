@@ -1,5 +1,6 @@
 import { Syne, DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import NavigationProgress from "@/components/NavigationProgress";
 
 const syne = Syne({
   subsets: ["latin"],
@@ -38,7 +39,10 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${syne.variable} ${dmSans.variable} ${jetbrains.variable}`}
     >
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        <NavigationProgress />
+        {children}
+      </body>
     </html>
   );
 }

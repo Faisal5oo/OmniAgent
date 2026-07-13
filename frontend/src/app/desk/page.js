@@ -306,12 +306,14 @@ export default function DecisionDeskPage() {
             {actions.map((action, i) => (
               <Link key={action.id} href={action.href}>
                 <motion.div
-                  className="group surface-sm flex flex-col gap-2 p-3.5 transition hover:border-white/10 sm:flex-row sm:items-center sm:gap-4"
+                  className="group surface-sm interactive-card flex flex-col gap-2 p-3.5 sm:flex-row sm:items-center sm:gap-4"
                   initial={{ opacity: 0, x: -8 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ ...SPRING_TRANSITION, delay: 0.08 + i * 0.04 }}
+                  whileHover={{ x: 4, scale: 1.01 }}
+                  whileTap={{ scale: 0.985 }}
                 >
-                  <span
+                  <motion.span
                     className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-mono text-xs font-semibold"
                     style={{
                       background:
@@ -328,9 +330,11 @@ export default function DecisionDeskPage() {
                             : "#dce5f0",
                       boxShadow: "0 0 0 1px rgba(255,255,255,0.06)",
                     }}
+                    whileHover={{ scale: 1.1, rotate: -4 }}
+                    transition={SPRING_TRANSITION}
                   >
                     {String(i + 1).padStart(2, "0")}
-                  </span>
+                  </motion.span>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="text-sm font-medium text-[#eef2f7]">
@@ -346,7 +350,12 @@ export default function DecisionDeskPage() {
                     <span className="font-mono text-xs text-signal">
                       {action.impact}
                     </span>
-                    <ArrowUpRight className="h-4 w-4 text-mist opacity-50 transition group-hover:text-signal group-hover:opacity-100" />
+                    <motion.span
+                      className="text-mist opacity-50 group-hover:text-signal group-hover:opacity-100"
+                      whileHover={{ x: 2, y: -2 }}
+                    >
+                      <ArrowUpRight className="h-4 w-4" />
+                    </motion.span>
                   </div>
                 </motion.div>
               </Link>

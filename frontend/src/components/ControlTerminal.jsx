@@ -151,12 +151,32 @@ export default function ControlTerminal({ onSubmit, isStreaming, threadId }) {
                   "0 0 0 1px rgba(61,255,168,0.4), 0 8px 24px rgba(61,255,168,0.3), inset 0 1px 0 rgba(255,255,255,0.3)",
                 color: "#04120c",
               }}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.92 }}
-              transition={SPRING_TRANSITION}
+              whileHover={{ scale: 1.1, rotate: 8 }}
+              whileTap={{ scale: 0.88, rotate: -6 }}
+              animate={
+                !isStreaming && query.trim()
+                  ? {
+                      boxShadow: [
+                        "0 0 0 1px rgba(61,255,168,0.4), 0 8px 24px rgba(61,255,168,0.25)",
+                        "0 0 0 1px rgba(61,255,168,0.55), 0 10px 32px rgba(61,255,168,0.45)",
+                        "0 0 0 1px rgba(61,255,168,0.4), 0 8px 24px rgba(61,255,168,0.25)",
+                      ],
+                    }
+                  : {}
+              }
+              transition={
+                !isStreaming && query.trim()
+                  ? { duration: 2.2, repeat: Infinity }
+                  : SPRING_TRANSITION
+              }
             >
               {isStreaming ? (
-                <Sparkles className="h-4 w-4 animate-pulse" />
+                <motion.span
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                >
+                  <Sparkles className="h-4 w-4" />
+                </motion.span>
               ) : (
                 <ArrowUpRight className="h-4 w-4" strokeWidth={2.25} />
               )}
@@ -204,14 +224,20 @@ export default function ControlTerminal({ onSubmit, isStreaming, threadId }) {
               type="button"
               disabled={isStreaming}
               onClick={() => setQuery(intent)}
-              className="group surface-sm relative px-3.5 py-3 text-left text-xs leading-relaxed text-mist-bright transition disabled:opacity-40"
+              className="group surface-sm interactive-card relative overflow-hidden px-3.5 py-3 text-left text-xs leading-relaxed text-mist-bright disabled:opacity-40"
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ ...SPRING_TRANSITION, delay: 0.2 + i * 0.06 }}
-              whileHover={{ x: 4 }}
+              whileHover={{ x: 5, scale: 1.01 }}
+              whileTap={{ scale: 0.985 }}
             >
-              <span className="absolute left-0 top-1/2 h-0 w-0.5 -translate-y-1/2 rounded-full bg-signal transition-all group-hover:h-1/2" />
-              <span className="transition-colors group-hover:text-mist-bright">
+              <motion.span
+                className="absolute left-0 top-1/2 w-0.5 -translate-y-1/2 rounded-full bg-signal"
+                initial={{ height: 0 }}
+                whileHover={{ height: "55%" }}
+                transition={SPRING_TRANSITION}
+              />
+              <span className="relative transition-colors group-hover:text-[#eef2f7]">
                 {intent}
               </span>
             </motion.button>
